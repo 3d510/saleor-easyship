@@ -71,12 +71,12 @@ class ShippingMethodCountryQueryset(models.QuerySet):
         return self.filter(id__in=ids)
 
 
-class Order(models.Model):
-    origin_country = models.CharField(max_length=2, default="SG", choices=COUNTRY_CODE_CHOICES)
-    origin_postal_code = models.CharField(max_length=50)
-    destination_country = models.CharField(max_length=2, default="SG", choices=COUNTRY_CODE_CHOICES)
-    destination_postal_code = models.CharField(max_length=50)
-    items = models.ManyToManyField("product.Product", related_name='orders')
+# class Order(models.Model):
+#     origin_country = models.CharField(max_length=2, default="SG", choices=COUNTRY_CODE_CHOICES)
+#     origin_postal_code = models.CharField(max_length=50)
+#     destination_country = models.CharField(max_length=2, default="SG", choices=COUNTRY_CODE_CHOICES)
+#     destination_postal_code = models.CharField(max_length=50)
+#     items = models.ManyToManyField("product.Product", related_name='orders')
 
 
 class ShippingMethodCountry(models.Model):
@@ -88,12 +88,10 @@ class ShippingMethodCountry(models.Model):
     shipping_method = models.ForeignKey(
         ShippingMethod, related_name='price_per_country',
         on_delete=models.CASCADE)
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    # order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    postal_code = models.CharField(max_length=50, blank=True)
 
     objects = ShippingMethodCountryQueryset.as_manager()
-
-    class Meta:
-        unique_together = ('country_code', 'shipping_method', 'order')
 
     def __str__(self):
         # https://docs.djangoproject.com/en/dev/ref/models/instances/#django.db.models.Model.get_FOO_display  # noqa
