@@ -1,6 +1,8 @@
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 
+from saleor.checkout.views.utils import get_items
+from saleor.product.models import Product, ProductVariant
 from ...account.forms import get_address_form
 from ...account.models import Address
 from ..forms import AnonymousUserShippingForm, ShippingAddressesForm
@@ -63,12 +65,19 @@ def user_shipping_address_view(request, checkout):
                 ShippingAddressesForm.NEW_ADDRESS):
             address_id = addresses_form.cleaned_data['address']
             checkout.shipping_address = Address.objects.get(id=address_id)
+
             return redirect('checkout:shipping-method')
         elif address_form.is_valid():
             checkout.shipping_address = address_form.instance
+
+
             return redirect('checkout:shipping-method')
     return TemplateResponse(
         request, 'checkout/shipping_address.html', context={
             'address_form': address_form, 'user_form': addresses_form,
             'checkout': checkout,
             'additional_addresses': additional_addresses})
+
+
+def get_couriers(checkout):
+    items = get_items(checkout)
