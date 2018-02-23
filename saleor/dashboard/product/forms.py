@@ -129,6 +129,7 @@ class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
         exclude = ['attributes', 'product_type', 'updated_at']
+        #TODO: update this
         labels = {
             'name': pgettext_lazy('Item name', 'Name'),
             'description': pgettext_lazy('Description', 'Description'),
@@ -141,7 +142,16 @@ class ProductForm(forms.ModelForm):
             'is_featured': pgettext_lazy(
                 'Featured product toggle', 'Feature this product on homepage'),
             'collections': pgettext_lazy(
-                'Add to collection select', 'Collections')}
+                'Add to collection select', 'Collections'),
+            'weight:': pgettext_lazy(
+                'Weight', 'weight'),
+            'height:': pgettext_lazy(
+                'Height', 'height'),
+            'width:': pgettext_lazy(
+                'Width', 'width'),
+            'length:': pgettext_lazy(
+                'Length', 'length')
+        }
 
     collections = forms.ModelMultipleChoiceField(
         required=False, queryset=Collection.objects.all())
@@ -155,8 +165,10 @@ class ProductForm(forms.ModelForm):
         self.product_attributes = self.product_attributes.prefetch_related(
             'values')
         self.prepare_fields_for_attributes()
+        # self.prepare_fields_for_additional_info()
         self.fields["collections"].initial = Collection.objects.filter(
             products__name=self.instance)
+
 
     def prepare_fields_for_attributes(self):
         for attribute in self.product_attributes:
@@ -170,6 +182,19 @@ class ProductForm(forms.ModelForm):
             else:
                 field = forms.CharField(**field_defaults)
             self.fields[attribute.get_formfield_name()] = field
+
+    # def prepare_fields_for_additional_info(self):
+    #     for info in self.product.instance.product_additional_info:
+    #         field_defaults = {
+    #             'label': info.weight,
+    #             'required': False,
+    #             'initial': self.instance.get_attribute(info.pk)}
+    #         if info.has_values():
+    #             field = CachingModelChoiceField(
+    #                 queryset=info.values.all(), **field_defaults)
+    #         else:
+    #             field = forms.CharField(**field_defaults)
+    #         self.fields[info.get_formfield_name()] = field
 
     def iter_attribute_fields(self):
         for attr in self.product_attributes:

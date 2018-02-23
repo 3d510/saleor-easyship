@@ -80,16 +80,16 @@ class ShippingMethodCountry(models.Model):
         ShippingMethod, related_name='price_per_country',
         on_delete=models.CASCADE)
 
-    origin_country = models.CharField(max_length=2, default="SG", choices=COUNTRY_CODE_CHOICES)
-    origin_postal_code = models.CharField(max_length=50)
-    destination_country = models.CharField(max_length=2, default="SG", choices=COUNTRY_CODE_CHOICES)
-    destination_postal_code = models.CharField(max_length=50)
-    taxes_duties_paid_by = models.CharField(
-        max_length=50,
-        choices=[("Sender", "Sender"), ("Receiver", "Receiver")],
-        default="Sender")
-    is_insured = models.BooleanField()
-    items = models.ManyToManyField("product.Product", related_name='orders')
+    # origin_country = models.CharField(max_length=2, default="SG", choices=COUNTRY_CODE_CHOICES)
+    # origin_postal_code = models.CharField(max_length=50)
+    # destination_country = models.CharField(max_length=2, default="SG", choices=COUNTRY_CODE_CHOICES)
+    # destination_postal_code = models.CharField(max_length=50)
+    # taxes_duties_paid_by = models.CharField(
+    #     max_length=50,
+    #     choices=[("Sender", "Sender"), ("Receiver", "Receiver")],
+    #     default="Sender")
+    # is_insured = models.BooleanField()
+    # items = models.ManyToManyField("product.Product", related_name='orders')
 
     objects = ShippingMethodCountryQueryset.as_manager()
 

@@ -148,6 +148,7 @@ def product_create(request, type_pk):
     product_type = get_object_or_404(ProductType, pk=type_pk)
     create_variant = not product_type.has_variants
     product = Product()
+    # product_additional_info = product.product_additional_info
     product.product_type = product_type
     product_form = forms.ProductForm(request.POST or None, instance=product)
     if create_variant:
@@ -159,6 +160,7 @@ def product_create(request, type_pk):
         variant_form = None
         variant_errors = False
 
+    print('product valid: ', product_form.is_valid())
     if product_form.is_valid() and not variant_errors:
         product = product_form.save()
         if create_variant:
@@ -170,7 +172,8 @@ def product_create(request, type_pk):
         return redirect('dashboard:product-detail', pk=product.pk)
     ctx = {
         'product_form': product_form, 'variant_form': variant_form,
-        'product': product}
+        'product': product,}
+        # 'product_additional_info': product_additional_info}
     return TemplateResponse(request, 'dashboard/product/form.html', ctx)
 
 

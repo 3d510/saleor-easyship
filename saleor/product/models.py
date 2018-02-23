@@ -57,6 +57,25 @@ class Category(MPTTModel):
         nodes = [node for node in ancestors] + [self]
         return '/'.join([node.slug for node in nodes])
 
+class ProductAdditionalInfo(models.Model):
+    actual_weight = models.FloatField()
+    height = models.FloatField()
+    width = models.FloatField()
+    length = models.FloatField()
+    category = models.CharField(max_length=255)
+    declared_currency = models.CharField(max_length=3)
+    declared_customs_value= models.IntegerField(default=100)
+
+    class Meta:
+        app_label = 'product'
+
+    def __str__(self):
+        return self.actual_weight
+
+    def __repr__(self):
+        class_ = type(self)
+        return '<%s.%s(pk=%r, weight=%r)>' % (
+            class_.__module__, class_.__name__, self.pk, self.actual_weight)
 
 class ProductType(models.Model):
     name = models.CharField(max_length=128)
@@ -88,6 +107,9 @@ class ProductQuerySet(models.QuerySet):
 
 
 class Product(models.Model):
+    # product_additional_info = models.ForeignKey(
+    #     ProductAdditionalInfo, related_name='products', on_delete=models.CASCADE, null=True
+    # )
     product_type = models.ForeignKey(
         ProductType, related_name='products', on_delete=models.CASCADE)
     name = models.CharField(max_length=128)
@@ -101,6 +123,15 @@ class Product(models.Model):
     attributes = HStoreField(default={})
     updated_at = models.DateTimeField(auto_now=True, null=True)
     is_featured = models.BooleanField(default=False)
+
+    # added
+    actual_weight = models.FloatField(default=1.0)
+    height = models.FloatField(default=1.0)
+    width = models.FloatField(default=1.0)
+    length = models.FloatField(default=1.0)
+    # category = models.CharField(max_length=255, default="mobile")
+    declared_currency = models.CharField(max_length=3, default="SGD",null=True, blank=True)
+    declared_customs_value = models.IntegerField(default=100, null=True, blank=True)
 
     objects = ProductQuerySet.as_manager()
 
@@ -176,6 +207,17 @@ class Product(models.Model):
             return None
         grosses = sorted(grosses, key=lambda x: x.tax)
         return PriceRange(min(grosses), max(grosses))
+
+    def to_dict(self):
+        return {
+            "actual_weight": self.actual_weight,
+            "height": self.height,
+            "width": self.width,
+            "length": self.length,
+            "category": self.category,
+            "declared_currency": self.declared_currency,
+            "declared_customs_value": self.declared_customs_value
+        }
 
 
 class ProductVariant(models.Model):
