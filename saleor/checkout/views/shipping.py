@@ -68,7 +68,7 @@ def user_shipping_address_view(request, checkout):
                 ShippingAddressesForm.NEW_ADDRESS):
             address_id = addresses_form.cleaned_data['address']
             checkout.shipping_address = Address.objects.get(id=address_id)
-            checkout.shipping_method_country_ids = get_couriers(checkout)
+            checkout.storage['shipping_method_country_ids'] = get_couriers(checkout)
             return redirect('checkout:shipping-method')
         elif address_form.is_valid():
             checkout.shipping_address = address_form.instance
