@@ -1,6 +1,7 @@
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 
+from saleor.checkout.views.utils import shipping_info
 from .discount import add_voucher_form, validate_voucher
 from .shipping import (anonymous_user_shipping_address_view,
                        user_shipping_address_view)
@@ -14,6 +15,7 @@ from ..core import load_checkout
 from ..forms import ShippingMethodForm
 from ...account.forms import LoginForm
 
+import json
 
 @load_checkout
 @validate_cart
@@ -49,6 +51,7 @@ def shipping_method_view(request, checkout):
         initial={'method': checkout.shipping_method})
     if shipping_method_form.is_valid():
         checkout.shipping_method = shipping_method_form.cleaned_data['method']
+        print(json.dumps(shipping_info(checkout)))
         return redirect('checkout:summary')
     return TemplateResponse(
         request, 'checkout/shipping_method.html',
