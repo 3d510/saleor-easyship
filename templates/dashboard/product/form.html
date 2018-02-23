@@ -105,6 +105,25 @@
                 <div class="row">
                   {{ product_form.is_published|materializecss }}
                 </div>
+               <div class="row">
+                  {{ product_form.actual_weight|materializecss }}
+                </div>
+                <div class="row">
+                  {{ product_form.height|materializecss }}
+                </div>
+                <div class="row">
+                  {{ product_form.width|materializecss }}
+                </div>
+                <div class="row">
+                  {{ product_form.length|materializecss }}
+                </div>
+{#                <div class="row">#}
+{#                  {{ product_form.declared_currency|materializecss }}#}
+{#                </div>#}
+{#                <div class="row">#}
+{#                  {{ product_form.declared_customs_value|materializecss }}#}
+{#                </div>#}
+{#                TODO: beautify#}
               </div>
             </div>
           </div>
