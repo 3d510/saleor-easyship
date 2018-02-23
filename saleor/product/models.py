@@ -214,7 +214,9 @@ class Product(models.Model):
             "height": self.height,
             "width": self.width,
             "length": self.length,
-            "category": self.category,
+            # "category": self.category.name,
+            # TODO: dm Long
+            "category": "watches",
             "declared_currency": self.declared_currency,
             "declared_customs_value": self.declared_customs_value
         }

@@ -42,6 +42,7 @@ def shipping_address_view(request, checkout):
 @validate_shipping_address
 @add_voucher_form
 def shipping_method_view(request, checkout):
+    # print("****", checkout.__dict__)
     """Display the shipping method selection step."""
     country_code = checkout.shipping_address.country.code
     shipping_method_form = ShippingMethodForm(

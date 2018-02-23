@@ -17,23 +17,23 @@ def post(endpoint, data):
     return json.loads(r.text)
 
 ## example
-print(get("reference/v1/categories"))
-print(post("rate/v1/rates", data={
-    "origin_country_alpha2": "SG",
-    "origin_postal_code": "059405",
-    "destination_country_alpha2": "US",
-    "destination_postal_code": 10030,
-    "taxes_duties_paid_by": "Sender",
-    "is_insured": False,
-    "items": [
-        {
-            "actual_weight": 1.2,
-            "height": 10,
-            "width": 15,
-            "length": 20,
-            "category": "mobiles",
-            "declared_currency": "SGD",
-            "declared_customs_value": 100
-        }
-    ]
-})["rates"][0]["shipment_charge_total"])
+# print(get("reference/v1/categories"))
+# print(post("rate/v1/rates", data={
+#     "origin_country_alpha2": "SG",
+#     "origin_postal_code": "059405",
+#     "destination_country_alpha2": "US",
+#     "destination_postal_code": 10030,
+#     "taxes_duties_paid_by": "Sender",
+#     "is_insured": False,
+#     "items": [
+#         {
+#             "actual_weight": 1.2,
+#             "height": 10,
+#             "width": 15,
+#             "length": 20,
+#             "category": "mobiles",
+#             "declared_currency": "SGD",
+#             "declared_customs_value": 100
+#         }
+#     ]
+# })["rates"][0]["shipment_charge_total"])
