@@ -4,11 +4,18 @@ from saleor.product.models import ProductVariant, Product
 PLATFORM_NAME = "TheWatchStrategy"
 
 def get_items(checkout):
-    product_ids = ProductVariant.objects.filter(id__in=checkout.cart.lines.values('variant')).values('product')
-    products = Product.objects.filter(id__in=product_ids)
     items = []
-    for product in products:
+    # product_ids = ProductVariant.objects.filter(id__in=checkout.cart.lines.values('variant')).values('product')
+    print(checkout.cart.lines.__dict__)
+    variants = [ProductVariant.objects.get(pk=variant['variant']) for variant in checkout.cart.lines.values('variant')]
+    for variant in variants:
+        product = variant.product
         items.append(product.to_dict())
+    # products = Product.objects.filter(id__in=product_ids)
+    # items = []
+    # for product in products:
+    #     items.append(product.to_dict())
+    print("items: ", len(items))
     return items
 
 

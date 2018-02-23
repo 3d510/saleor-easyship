@@ -84,12 +84,13 @@ class ShippingMethodForm(forms.Form):
         required=True)
 
     def __init__(self, country_code, *args, **kwargs):
+        shipping_method_country_ids = kwargs.pop('shipping_method_country_ids', None)
         super().__init__(*args, **kwargs)
         method_field = self.fields['method']
         if country_code:
             queryset = method_field.queryset
             method_field.queryset = queryset.unique_for_country_code(
-                country_code)
+                country_code, shipping_method_country_ids)
 
         if self.initial.get('method') is None:
             self.initial['method'] = method_field.queryset.first()

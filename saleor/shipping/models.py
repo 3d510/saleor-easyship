@@ -46,7 +46,10 @@ class ShippingMethod(models.Model):
 
 class ShippingMethodCountryQueryset(models.QuerySet):
 
-    def unique_for_country_code(self, country_code):
+    def unique_for_country_code(self, country_code, shipping_method_country_ids):
+        if shipping_method_country_ids:
+            return self.filter(id__in=shipping_method_country_ids)
+
         shipping = self.filter(
             Q(country_code=country_code) |
             Q(country_code=ANY_COUNTRY))

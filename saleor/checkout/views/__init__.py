@@ -2,6 +2,7 @@ from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 
 from saleor.checkout.views.utils import shipping_info
+from saleor.shipping.models import ShippingMethod
 from .discount import add_voucher_form, validate_voucher
 from .shipping import (anonymous_user_shipping_address_view,
                        user_shipping_address_view)
@@ -44,15 +45,23 @@ def shipping_address_view(request, checkout):
 @validate_shipping_address
 @add_voucher_form
 def shipping_method_view(request, checkout):
-    # print("****", checkout.__dict__)
     """Display the shipping method selection step."""
+    # print(checkout.__dict__)
     country_code = checkout.shipping_address.country.code
+    shipping_method_country_ids = checkout.storage['shipping_method_country_ids']
     shipping_method_form = ShippingMethodForm(
         country_code, request.POST or None,
-        initial={'method': checkout.shipping_method})
+        initial={'method': checkout.shipping_method}
+        , shipping_method_country_ids=shipping_method_country_ids
+    )
     if shipping_method_form.is_valid():
         checkout.shipping_method = shipping_method_form.cleaned_data['method']
-        print(json.dumps(shipping_info(checkout)))
+        selected_courier_name = shipping_method_form.cleaned_data['method']
+        print(selected_courier_name)
+        # selected_courier_id = ShippingMethod.objects.get(name=selected_courier_name).courier_id
+        shipment_info = shipping_info(checkout)
+        # print(json.dumps(shipping_info(checkout)))
+
         return redirect('checkout:summary')
     return TemplateResponse(
         request, 'checkout/shipping_method.html',

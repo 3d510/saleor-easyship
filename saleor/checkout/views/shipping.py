@@ -68,11 +68,13 @@ def user_shipping_address_view(request, checkout):
                 ShippingAddressesForm.NEW_ADDRESS):
             address_id = addresses_form.cleaned_data['address']
             checkout.shipping_address = Address.objects.get(id=address_id)
-            print(get_couriers(checkout))
+            checkout.shipping_method_country_ids = get_couriers(checkout)
             return redirect('checkout:shipping-method')
         elif address_form.is_valid():
             checkout.shipping_address = address_form.instance
-            print(get_couriers(checkout))
+            # print(checkout.storage)
+            checkout.storage['shipping_method_country_ids'] = get_couriers(checkout)
+            # print(checkout.__dict__)
             return redirect('checkout:shipping-method')
     return TemplateResponse(
         request, 'checkout/shipping_address.html', context={
@@ -82,6 +84,8 @@ def user_shipping_address_view(request, checkout):
 
 
 def get_couriers(checkout):
+    # return list of shipping_method_country ids
+
     items = get_items(checkout)
     postal_code = checkout.__dict__['storage']['shipping_address']['postal_code']
     country_code = checkout.__dict__['storage']['shipping_address']['country']
@@ -94,22 +98,25 @@ def get_couriers(checkout):
         "is_insured": False,
         "items": items
     }
-    rates = post("rate/v1/rates", data)['rates']
+    import json
+    print(json.dumps(data, indent=True))
+    rates = post("rate/v1/rates", data).get('rates', [])
     results = []
+
     for rate in rates:
-        results.append({
-            "courier_id": rate["courier_id"],
-            "courier_name": rate["courier_name"],
-            "charge": rate['shipment_charge_total']
-        })
-        shipping_method = ShippingMethod.objects.create(
+        # results.append({
+        #     "courier_id": rate["courier_id"],
+        #     "courier_name": rate["courier_name"],
+        #     "charge": rate['shipment_charge_total']
+        # })
+        shipping_method, created = ShippingMethod.objects.get_or_create(
             name=rate["courier_name"],
             courier_id=rate["courier_id"])
-        shipping_method_country = ShippingMethodCountry.objects.create(
+        shipping_method_country, created = ShippingMethodCountry.objects.get_or_create(
             country_code=country_code,
             price=rate['shipment_charge_total'],
             postal_code=postal_code,
             shipping_method=shipping_method
         )
-    print(results)
+        results.append(shipping_method_country.pk)
     return results
