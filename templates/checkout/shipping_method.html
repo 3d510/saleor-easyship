@@ -13,6 +13,14 @@
     {% csrf_token %}
     <h2>{% trans "Shipping method" context "Checkout shipping method form title" %}</h2>
     {% bootstrap_form shipping_method_form show_label=False %}
+
+    <b>Best shipping price with</b>
+    {% if related_products %}
+      {% for prod in related_products %}
+        <p>{{ prod }}</p>
+      {% endfor %}
+    {% endif %}
+
     <p class="text-md-right">
       <button type="submit" class="btn primary">
         {% trans "Continue" context "Checkout shipping method primary action" %}

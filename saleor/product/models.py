@@ -17,6 +17,7 @@ from prices import PriceRange
 from text_unidecode import unidecode
 from versatileimagefield.fields import PPOIField, VersatileImageField
 
+from saleor.easyship.api import post
 from ..core.exceptions import InsufficientStock
 from ..discount.utils import calculate_discounted_price
 from .utils import get_attributes_display_map
@@ -112,7 +113,7 @@ class Product(models.Model):
     # )
     product_type = models.ForeignKey(
         ProductType, related_name='products', on_delete=models.CASCADE)
-    name = models.CharField(max_length=128)
+    name = models.CharField(max_length=128, unique=True)
     description = models.TextField()
     category = models.ForeignKey(
         Category, related_name='products', on_delete=models.CASCADE)
@@ -223,6 +224,48 @@ class Product(models.Model):
             "declared_customs_value": self.declared_customs_value
         }
 
+    def get_most_related_products(self, checkout):
+        other_products = Product.objects.exclude(pk=self.pk)
+        postal_code = checkout.__dict__['storage']['shipping_address']['postal_code']
+        country_code = checkout.__dict__['storage']['shipping_address']['country']
+
+        data = {
+            "origin_country_alpha2": "SG",
+            "origin_postal_code": "639778",
+            "destination_country_alpha2": country_code,
+            "destination_postal_code": postal_code,
+            "taxes_duties_paid_by": "Sender",
+            "is_insured": False
+        }
+
+        # for individual product
+        data['items'] = [self.to_dict()]
+        rates = post("rate/v1/rates", data).get('rates', [])
+        criteria = sorted([(rate['shipment_charge_total'], rate['min_delivery_time']) for rate in rates])
+        if len(criteria) == 1:
+            criteria = [criteria[0][0], criteria[0][0], criteria[0][0]]
+        elif len(criteria) == 2:
+            criteria = [criteria[0][0], criteria[0][0], criteria[1][0]]
+        else:
+            criteria = [criteria[0][0], criteria[1][0], criteria[-1][0]]
+
+        # for combining products
+        increase = []
+        for product in other_products:
+            data['items'] = [self.to_dict(), product.to_dict()]
+            combined_rates = post("rate/v1/rates", data).get('rates', [])
+            combined_criteria = sorted([(combined_rate['shipment_charge_total'], combined_rate['min_delivery_time']) for combined_rate in combined_rates])
+            if len(combined_criteria) == 1:
+                combined_criteria = [combined_criteria[0][0], combined_criteria[0][0], combined_criteria[0][0]]
+            elif len(criteria) == 2:
+                combined_criteria = [combined_criteria[0][0], combined_criteria[0][0], combined_criteria[1][0]]
+            else:
+                combined_criteria = [combined_criteria[0][0], combined_criteria[1][0], combined_criteria[-1][0]]
+
+            min_increase = min(combined_criteria[2] - criteria[2], combined_criteria[1] - criteria[1], combined_criteria[0] - criteria[0])
+            increase.append((min_increase, product.pk))
+        increase = sorted(increase)
+        return [p[1] for p in increase[:3]]
 
 class ProductVariant(models.Model):
     sku = models.CharField(max_length=32, unique=True)
