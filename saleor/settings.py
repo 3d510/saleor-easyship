@@ -259,7 +259,7 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 
 CHECKOUT_PAYMENT_CHOICES = [
-    ('default', 'Dummy provider')]
+    ('default', 'Choose from available providers')]
 
 MESSAGE_TAGS = {
     messages.ERROR: 'danger'}
@@ -283,6 +283,7 @@ TEST_RUNNER = ''
 ALLOWED_HOSTS = get_list(os.environ.get('ALLOWED_HOSTS', 'localhost'))
 ALLOWED_HOSTS.append('127.0.0.1')
 ALLOWED_HOSTS.append('10.194.102.77')
+ALLOWED_HOSTS.append('192.168.43.168')
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 

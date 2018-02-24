@@ -96,6 +96,11 @@ class ShippingMethodCountry(models.Model):
     # order = models.ForeignKey(Order, on_delete=models.CASCADE)
     postal_code = models.CharField(max_length=50, blank=True)
 
+
+    # added
+    min_delivery_time = models.IntegerField(null=True)
+    max_delivery_time = models.IntegerField(null=True)
+
     objects = ShippingMethodCountryQueryset.as_manager()
 
     def __str__(self):

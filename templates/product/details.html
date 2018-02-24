@@ -167,9 +167,17 @@
         </p>
       {% endif %}
       <div class="product__info__description">
-        <h3>{% trans "Description" context "Product details title" %}</h3>
+        <h3><strong>{% trans "Description" context "Product details title" %}</h3></strong>
         <hr>
-        {{ product.description|safe }}
+       {{ product.description|safe }}
+      </div>
+
+     <div class="product__info__description">
+        <h3><strong>{% trans "Additional information" context "Product additional information title" %}</h3></strong>
+        <hr>
+        Dimensions (W x H x L): {{ product.width|safe }} cm x {{ product.height|safe }} cm x {{ product.length| safe }} cm
+         <hr>
+         Weight: {{ product.actual_weight|safe }} kg
       </div>
       <hr>
       <table>

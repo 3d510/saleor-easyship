@@ -69,7 +69,10 @@ class ShippingCountryChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
         """Return a friendly label for the shipping method."""
         price_html = format_price(obj.price.gross, obj.price.currency)
-        label = mark_safe('%s %s' % (obj.shipping_method, price_html))
+        min_delivery_time = str(obj.min_delivery_time)
+        max_delivery_time = str(obj.max_delivery_time)
+
+        label = mark_safe('Courier: %s | Price: %s | Estimated time: %s - %s days' % (obj.shipping_method, price_html, min_delivery_time, max_delivery_time))
         return label
 
 
@@ -87,6 +90,8 @@ class ShippingMethodForm(forms.Form):
         shipping_method_country_ids = kwargs.pop('shipping_method_country_ids', None)
         super().__init__(*args, **kwargs)
         method_field = self.fields['method']
+        print("@@@@@@@@@@@@")
+        print(self.fields['method'].__dict__)
         if country_code:
             queryset = method_field.queryset
             method_field.queryset = queryset.unique_for_country_code(

@@ -74,8 +74,10 @@ def user_shipping_address_view(request, checkout):
             checkout.shipping_address = address_form.instance
             # print(checkout.storage)
             checkout.storage['shipping_method_country_ids'] = get_couriers(checkout)
-            # print(checkout.__dict__)
+
             return redirect('checkout:shipping-method')
+    print("************************muahaa")
+    print("checkout", checkout.__dict__)
     return TemplateResponse(
         request, 'checkout/shipping_address.html', context={
             'address_form': address_form, 'user_form': addresses_form,
@@ -114,7 +116,11 @@ def get_couriers(checkout):
             country_code=country_code,
             price=rate['shipment_charge_total'],
             postal_code=postal_code,
-            shipping_method=shipping_method
+            shipping_method=shipping_method,
+            min_delivery_time = rate["min_delivery_time"],
+            max_delivery_time = rate["max_delivery_time"]
         )
         results.append(shipping_method_country.pk)
+    print("************************")
+    print("results", results)
     return results

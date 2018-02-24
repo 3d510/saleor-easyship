@@ -9,7 +9,7 @@ from .models import OrderNote, Payment
 
 class PaymentMethodsForm(forms.Form):
     method = forms.ChoiceField(
-        label=pgettext_lazy('Payment methods form label', 'Method'),
+        label=pgettext_lazy('Payment methods form label', 'Payment Method'),
         choices=settings.CHECKOUT_PAYMENT_CHOICES, widget=forms.RadioSelect,
         initial=settings.CHECKOUT_PAYMENT_CHOICES[0][0])
 
