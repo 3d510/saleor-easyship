@@ -23,6 +23,7 @@ def anonymous_user_shipping_address_view(request, checkout):
         if not preview else request.POST.dict())
     if all([user_form.is_valid(), address_form.is_valid()]):
         checkout.shipping_address = address_form.instance
+
         checkout.email = user_form.cleaned_data['email']
         return redirect('checkout:shipping-method')
     return TemplateResponse(
