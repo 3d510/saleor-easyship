@@ -3,6 +3,7 @@ from django.template.response import TemplateResponse
 
 from saleor.checkout.views.utils import get_items
 from saleor.easyship.api import post
+from saleor.product.models import ProductVariant
 from saleor.shipping.models import ShippingMethod, ShippingMethodCountry
 from ...account.forms import get_address_form
 from ...account.models import Address
@@ -69,15 +70,25 @@ def user_shipping_address_view(request, checkout):
             address_id = addresses_form.cleaned_data['address']
             checkout.shipping_address = Address.objects.get(id=address_id)
             checkout.storage['shipping_method_country_ids'] = get_couriers(checkout)
+
+            if checkout.cart.quantity == 1:
+                variant = [ProductVariant.objects.get(pk=variant['variant']) for variant in checkout.cart.lines.values('variant')][0]
+                product = variant.product
+                checkout.storage['related_products'] = product.get_most_related_products(checkout)
+
             return redirect('checkout:shipping-method')
         elif address_form.is_valid():
             checkout.shipping_address = address_form.instance
             # print(checkout.storage)
             checkout.storage['shipping_method_country_ids'] = get_couriers(checkout)
 
+
+            if checkout.cart.quantity == 1:
+                variant = [ProductVariant.objects.get(pk=variant['variant']) for variant in checkout.cart.lines.values('variant')][0]
+                product = variant.product
+                checkout.storage['related_products'] = product.get_most_related_products(checkout)
             return redirect('checkout:shipping-method')
-    print("************************muahaa")
-    print("checkout", checkout.__dict__)
+
     return TemplateResponse(
         request, 'checkout/shipping_address.html', context={
             'address_form': address_form, 'user_form': addresses_form,

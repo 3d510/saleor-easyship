@@ -3,6 +3,7 @@ from django.template.response import TemplateResponse
 
 from saleor.checkout.views.utils import shipping_info
 from saleor.easyship.api import post
+from saleor.product.models import Product
 from saleor.shipping.models import ShippingMethod, Shipment
 from .discount import add_voucher_form, validate_voucher
 from .shipping import (anonymous_user_shipping_address_view,
@@ -50,6 +51,11 @@ def shipping_method_view(request, checkout):
     # print(checkout.__dict__)
     country_code = checkout.shipping_address.country.code
     shipping_method_country_ids = checkout.storage['shipping_method_country_ids']
+    related_product_ids = checkout.storage.get('related_products', [])
+    related_products = []
+    for pk in related_product_ids:
+        related_products.append(Product.objects.get(pk=pk))
+
     shipping_method_form = ShippingMethodForm(
         country_code, request.POST or None,
         initial={'method': checkout.shipping_method}
@@ -85,7 +91,9 @@ def shipping_method_view(request, checkout):
         request, 'checkout/shipping_method.html',
         context={
             'shipping_method_form': shipping_method_form,
-            'checkout': checkout})
+            'checkout': checkout,
+            'related_products': related_products
+        })
 
 
 @load_checkout

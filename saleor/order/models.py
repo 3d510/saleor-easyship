@@ -170,7 +170,7 @@ class Order(models.Model):
     def get_status_display(self):
         """Order status display text."""
         # return dict(OrderStatus.CHOICES)[self.status]
-        return self.status
+        return "%s - delivery time: %d - %d days" % (self.status, int(self.min_delivery_time), int(self.max_delivery_time))
 
     @property
     def total(self):

@@ -98,8 +98,8 @@ class ShippingMethodCountry(models.Model):
 
 
     # added
-    min_delivery_time = models.IntegerField(null=True)
-    max_delivery_time = models.IntegerField(null=True)
+    min_delivery_time = models.IntegerField(null=True, default=2)
+    max_delivery_time = models.IntegerField(null=True,default=4 )
 
     objects = ShippingMethodCountryQueryset.as_manager()
 
