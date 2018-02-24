@@ -225,7 +225,7 @@ class Product(models.Model):
         }
 
     def get_most_related_products(self, checkout):
-        other_products = Product.objects.exclude(pk=self.pk)
+        other_products = Product.objects.exclude(pk=self.pk).order_by('actual_weight')[:10]
         postal_code = checkout.__dict__['storage']['shipping_address']['postal_code']
         country_code = checkout.__dict__['storage']['shipping_address']['country']
 
@@ -265,7 +265,7 @@ class Product(models.Model):
             min_increase = min(combined_criteria[2] - criteria[2], combined_criteria[1] - criteria[1], combined_criteria[0] - criteria[0])
             increase.append((min_increase, product.pk))
         increase = sorted(increase)
-        return [p[1] for p in increase[:3]]
+        return [p for p in increase[:3]]
 
 class ProductVariant(models.Model):
     sku = models.CharField(max_length=32, unique=True)
