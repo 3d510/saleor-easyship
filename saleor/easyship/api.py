@@ -8,8 +8,8 @@ HEADER = {"Content-Type": "application/json", "Authorization": "Bearer prod_7J8b
 #     return "prod_7J8bff5sfosdM/5l7Kg5y2Un8qMhQCCKj2idK7OJQz8="
 
 
-def get(endpoint):
-    r = requests.get(HOSTING_URL + endpoint, headers = HEADER)
+def get(endpoint, payload={}):
+    r = requests.get(HOSTING_URL + endpoint, headers = HEADER, params=payload)
     return json.loads(r.text)
 
 def post(endpoint, data):

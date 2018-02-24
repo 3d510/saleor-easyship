@@ -210,7 +210,7 @@ class Product(models.Model):
 
     def to_dict(self):
         return {
-            "description": self.description,
+            "description": self.description[:200],
             "actual_weight": self.actual_weight,
             "height": self.height,
             "width": self.width,

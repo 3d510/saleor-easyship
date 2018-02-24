@@ -3,7 +3,6 @@ from django.template.response import TemplateResponse
 
 from saleor.checkout.views.utils import get_items
 from saleor.easyship.api import post
-from saleor.product.models import Product, ProductVariant
 from saleor.shipping.models import ShippingMethod, ShippingMethodCountry
 from ...account.forms import get_address_form
 from ...account.models import Address
@@ -98,8 +97,6 @@ def get_couriers(checkout):
         "is_insured": False,
         "items": items
     }
-    import json
-    print(json.dumps(data, indent=True))
     rates = post("rate/v1/rates", data).get('rates', [])
     results = []
 

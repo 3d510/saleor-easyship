@@ -328,6 +328,11 @@ class Checkout:
             order_data['discount_amount'] = discount.amount
             order_data['discount_name'] = discount.name
 
+        order_data['easyship_shipment_id'] = self.storage['easyship_shipment_id']
+        order_data['platform_order_number'] = self.storage['platform_order_number']
+        order_data['min_delivery_time'] = self.storage['min_delivery_time']
+        order_data['max_delivery_time'] = self.storage['max_delivery_time']
+
         order = Order.objects.create(**order_data)
 
         for partition in self.cart.partition():

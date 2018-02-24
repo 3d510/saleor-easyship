@@ -1,3 +1,5 @@
+from django_countries import countries
+
 from saleor.product.models import ProductVariant, Product
 
 
@@ -20,9 +22,14 @@ def get_items(checkout):
 
 
 def shipping_info(checkout):
+    city = checkout.__dict__['storage']['shipping_address']['city']
+    country_alpha2 = checkout.__dict__['storage']['shipping_address']['country']
+    for c in countries:
+        if c[0] == country_alpha2:
+            country = c[1]
     return {
         "destination_country_alpha2": checkout.__dict__['storage']['shipping_address']['country'],
-        "destination_city":  checkout.__dict__['storage']['shipping_address']['city'],
+        "destination_city":  city or country,
         "destination_name":  checkout.__dict__['storage']['shipping_address']['first_name']+checkout.__dict__['storage']['shipping_address']['last_name'] ,
         "destination_address_line_1": checkout.__dict__['storage']['shipping_address']['street_address_1'],
         "destination_phone_number": checkout.__dict__['storage']['shipping_address']['phone'],

@@ -14,6 +14,7 @@ from payments import PaymentStatus, PurchasedItem
 from payments.models import BasePayment
 from prices import FixedDiscount, Price
 
+from saleor.easyship.api import get
 from . import GroupStatus, OrderStatus
 from ..account.models import Address
 from ..core.utils import build_absolute_uri
@@ -71,6 +72,11 @@ class Order(models.Model):
         currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
         blank=True, null=True)
     discount_name = models.CharField(max_length=255, default='', blank=True)
+
+    easyship_shipment_id = models.CharField(max_length=255, blank=True, null=True)
+    platform_order_number = models.CharField(max_length=255, blank=True, null=True)
+    min_delivery_time = models.IntegerField(blank=True, null=True)
+    max_delivery_time = models.IntegerField(blank=True, null=True)
 
     objects = OrderQuerySet.as_manager()
 
@@ -143,10 +149,19 @@ class Order(models.Model):
     @property
     def status(self):
         """Order status deduced from shipment groups."""
-        statuses = set([group.status for group in self.groups.all()])
-        return (
-            OrderStatus.OPEN if GroupStatus.NEW in statuses
-            else OrderStatus.CLOSED)
+        # statuses = set([group.status for group in self.groups.all()])
+        # return (
+        #     OrderStatus.OPEN if GroupStatus.NEW in statuses
+        #     else OrderStatus.CLOSED)
+
+        data = get("track/v1/status", {"easyship_shipment_id": self.easyship_shipment_id,
+                                       "platform_order_number": self.platform_order_number})
+        shipments = data.get('shipments', [])
+        print(shipments)
+        status = "Unknown"
+        for shipment in shipments:
+            status = shipment['status']
+        return status
 
     @property
     def is_open(self):
@@ -154,7 +169,8 @@ class Order(models.Model):
 
     def get_status_display(self):
         """Order status display text."""
-        return dict(OrderStatus.CHOICES)[self.status]
+        # return dict(OrderStatus.CHOICES)[self.status]
+        return self.status
 
     @property
     def total(self):
