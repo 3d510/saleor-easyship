@@ -20,10 +20,10 @@
         {% bootstrap_form shipping_method_form show_label=False %}
         <hr>
         <h2>Best shipping price with: </h2>
-        {% if related_products %}
+        {% if related_product_objs %}
             <div class="row">
 
-                {% for product in related_products %}
+                {% for price, product in related_product_objs %}
                     <div class="col-md-4">
                         <a href=" {{ product.get_absolute_url }}" class="link--clean">
                         <div class="text-center">
@@ -32,28 +32,19 @@
                                      data-src="{% product_first_image product method="crop" size="120x120" %}"
                                      data-srcset="{% product_first_image product method="crop" size="120x120" %} 1x, {% product_first_image product method="crop" size="240x240" %} 2x"
                                      alt=""
-                                     src="{% placeholder size=255 %}">
-                                <span class="product-list-item-name" title="{{ product }}">{{ product }}</span>
+                                     src="{% placeholder size=120 %}">
+
+                                <span class="product-list-item-name" style="text-overflow: ellipsis; overflow: hidden" title="{{ product}}">{{ product }}</span>
+
                             </div>
                         </div>
+
                         <div class="panel-footer">
-                            {% if availability.available %}
-                                {% price_range availability.price_range %}
-                                {% if availability.discount %}
-                                    {% if availability.price_range_undiscounted.min_price != availability.price_range.min_price %}
-                                        <div class="product-list__sale">
-                                            <svg data-src="{% static "images/sale-bg.svg" %}"/>
-                                            <span class="product-list__sale__text">
-                    {% comment %}Translators: Layout may break if character length is different than four.{% endcomment %}
-                    {% trans "Sale" context "Sale (discount) label for item in product list" %}
-                  </span>
+                            <p>Only add <span style="color: red; font-weight: 600;">SGD ${{ price }}</span> for shipment</p>
+                            <br>
+                            <span class="product__info__price" style="color: rgb(20,20,20)"><strong>Price: SGD ${{ product.price.0 }}</strong></span>
                                         </div>
-                                    {% endif %}
-                                {% endif %}
-                            {% else %}
-                                &nbsp;
-                            {% endif %}
-                        </div>
+
                         </a>
 
                     </div>

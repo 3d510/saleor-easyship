@@ -51,10 +51,10 @@ def shipping_method_view(request, checkout):
     # print(checkout.__dict__)
     country_code = checkout.shipping_address.country.code
     shipping_method_country_ids = checkout.storage['shipping_method_country_ids']
-    related_product_ids = checkout.storage.get('related_products', [])
-    related_products = []
-    for pk in related_product_ids:
-        related_products.append(Product.objects.get(pk=pk))
+    related_products = checkout.storage.get('related_products', [])
+
+    related_product_objs = [(item[0], Product.objects.get(pk=item[1])) for item in related_products]
+    print(related_product_objs)
 
     shipping_method_form = ShippingMethodForm(
         country_code, request.POST or None,
@@ -92,7 +92,7 @@ def shipping_method_view(request, checkout):
         context={
             'shipping_method_form': shipping_method_form,
             'checkout': checkout,
-            'related_products': related_products
+            'related_product_objs': related_product_objs
         })
 
 
