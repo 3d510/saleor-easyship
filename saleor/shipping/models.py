@@ -9,6 +9,8 @@ from django_countries import countries
 from django_prices.models import PriceField
 from prices import PriceRange
 
+from saleor.account.models import User
+
 ANY_COUNTRY = ''
 ANY_COUNTRY_DISPLAY = pgettext_lazy('Country choice', 'Rest of World')
 COUNTRY_CODE_CHOICES = [(ANY_COUNTRY, ANY_COUNTRY_DISPLAY)] + list(countries)
@@ -103,3 +105,13 @@ class ShippingMethodCountry(models.Model):
 
     def get_total(self):
         return self.price
+
+
+class Shipment(models.Model):
+
+    easyship_shipment_id = models.CharField(max_length=255)
+    platform_order_number = models.CharField(max_length=255)
+    min_delivery_time = models.IntegerField()
+    max_delivery_time = models.IntegerField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='shipments', null=True, blank=True)
+

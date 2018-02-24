@@ -2,7 +2,8 @@ from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 
 from saleor.checkout.views.utils import shipping_info
-from saleor.shipping.models import ShippingMethod
+from saleor.easyship.api import post
+from saleor.shipping.models import ShippingMethod, Shipment
 from .discount import add_voucher_form, validate_voucher
 from .shipping import (anonymous_user_shipping_address_view,
                        user_shipping_address_view)
@@ -56,11 +57,28 @@ def shipping_method_view(request, checkout):
     )
     if shipping_method_form.is_valid():
         checkout.shipping_method = shipping_method_form.cleaned_data['method']
-        selected_courier_name = shipping_method_form.cleaned_data['method']
-        print(selected_courier_name)
+        selected_courier = shipping_method_form.cleaned_data['method']
         # selected_courier_id = ShippingMethod.objects.get(name=selected_courier_name).courier_id
-        shipment_info = shipping_info(checkout)
-        # print(json.dumps(shipping_info(checkout)))
+        ship_info = shipping_info(checkout)
+        ship_info['selected_courier_id'] = selected_courier.shipping_method.courier_id
+
+        import json
+        print(json.dumps(ship_info, indent=True))
+
+        shipment = post("shipment/v1/shipments", ship_info)['shipment']
+        print(shipment, request.user)
+        # Shipment.objects.create(
+        #     easyship_shipment_id=shipment['easyship_shipment_id'],
+        #     platform_order_number=shipment['platform_order_number'],
+        #     min_delivery_time=shipment['selected_courier']['min_delivery_time'],
+        #     max_delivery_time=shipment['selected_courier']['max_delivery_time'],
+        #     user=request.user
+        # )
+
+        checkout.storage['easyship_shipment_id'] = shipment['easyship_shipment_id']
+        checkout.storage['platform_order_number'] = shipment['platform_order_number']
+        checkout.storage['min_delivery_time'] = shipment['selected_courier']['min_delivery_time']
+        checkout.storage['max_delivery_time'] = shipment['selected_courier']['max_delivery_time']
 
         return redirect('checkout:summary')
     return TemplateResponse(
